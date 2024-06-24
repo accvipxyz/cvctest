@@ -1,2 +1,5 @@
 telebot
 pyTelegramBotAPI
+requests
+fastapi
+uvicorn
