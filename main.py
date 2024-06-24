@@ -3,7 +3,7 @@ import time
 import random
 
 # استبدل بـ TOKEN الخاص بك
-TOKEN = "7348415101:AAHCeZz25fmNlnsmvmx_275xHueDgrBa98E"
+TOKEN = "7348415101:AAHRrIomYuI2P9yB7zxjqX5tdkcy1BPjDEk"
 
 # إنشاء مثيل من بوت Telegram
 bot = telebot.TeleBot(TOKEN)
@@ -38,4 +38,4 @@ def send_random_dhikr():
 # تشغيل البوت بشكل مستمر
 while True:
     send_random_dhikr()
-    time.sleep(5)  # انتظار 5 ثوانٍ قبل إرسال ذكر جديد
+    time.sleep(2)  # انتظار 5 ثوانٍ قبل إرسال ذكر جديد
