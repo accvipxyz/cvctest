@@ -1,9 +1,11 @@
 import telebot
 import time
 import random
+from fastapi import FastAPI
+import uvicorn
 
 # استبدل بـ TOKEN الخاص بك
-TOKEN = "7348415101:AAHRrIomYuI2P9yB7zxjqX5tdkcy1BPjDEk"
+TOKEN = "7348415101:AAHk06P0XfTk4L43nsAl8QrOwbAYJVxIpxc"
 
 # إنشاء مثيل من بوت Telegram
 bot = telebot.TeleBot(TOKEN)
@@ -36,6 +38,24 @@ def send_random_dhikr():
         bot.send_message(chat_id, dhikr)
 
 # تشغيل البوت بشكل مستمر
-while True:
-    send_random_dhikr()
-    time.sleep(2)  # انتظار 5 ثوانٍ قبل إرسال ذكر جديد
+def start_bot():
+    while True:
+        send_random_dhikr()
+        time.sleep(5)  # انتظار 5 ثوانٍ قبل إرسال ذكر جديد
+
+# إنشاء تطبيق FastAPI
+app = FastAPI()
+
+@app.on_event("startup")
+async def startup_event():
+    # تشغيل البوت في عملية خلفية
+    import threading
+    bot_thread = threading.Thread(target=start_bot)
+    bot_thread.start()
+
+@app.get("/")
+def read_root():
+    return {"message": "Bot is running"}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
