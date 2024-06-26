@@ -5,7 +5,7 @@ from fastapi import FastAPI
 import uvicorn
 
 # استبدل بـ TOKEN الخاص بك
-TOKEN = "7348415101:AAHk06P0XfTk4L43nsAl8QrOwbAYJVxIpxc"
+TOKEN = "7348415101:AAHdpiDT6jH03VOFPxMF9cjwN0LL-V82buw"
 
 # إنشاء مثيل من بوت Telegram
 bot = telebot.TeleBot(TOKEN)
@@ -41,7 +41,7 @@ def send_random_dhikr():
 def start_bot():
     while True:
         send_random_dhikr()
-        time.sleep(5)  # انتظار 5 ثوانٍ قبل إرسال ذكر جديد
+        time.sleep(300)  # انتظار 5 ثوانٍ قبل إرسال ذكر جديد
 
 # إنشاء تطبيق FastAPI
 app = FastAPI()
