@@ -3,6 +3,7 @@ import time
 import random
 from fastapi import FastAPI
 import uvicorn
+import threading
 
 # استبدل بـ TOKEN الخاص بك
 TOKEN = "7348415101:AAHdpiDT6jH03VOFPxMF9cjwN0LL-V82buw"
@@ -33,15 +34,23 @@ def send_random_dhikr():
     # اختيار ذكر عشوائي من القائمة
     dhikr = random.choice(adhkar)
 
-    # إرسال الذكر إلى جميع المستخدمين
+    # إرسال الذكر إلى جميع المستخدمين مع مراعاة حدود المعدل
     for chat_id in chat_ids:
-        bot.send_message(chat_id, dhikr)
+        try:
+            bot.send_message(chat_id, dhikr)
+        except telebot.apihelper.ApiTelegramException as e:
+            if e.result_json['error_code'] == 429:
+                retry_after = int(e.result_json['parameters']['retry_after'])
+                time.sleep(retry_after)
+                bot.send_message(chat_id, dhikr)
+            else:
+                print(f"Error: {e}")
 
 # تشغيل البوت بشكل مستمر
 def start_bot():
     while True:
         send_random_dhikr()
-        time.sleep(300)  # انتظار 5 ثوانٍ قبل إرسال ذكر جديد
+        time.sleep(800)  # انتظار 5 دقائق قبل إرسال ذكر جديد
 
 # إنشاء تطبيق FastAPI
 app = FastAPI()
@@ -49,7 +58,6 @@ app = FastAPI()
 @app.on_event("startup")
 async def startup_event():
     # تشغيل البوت في عملية خلفية
-    import threading
     bot_thread = threading.Thread(target=start_bot)
     bot_thread.start()
 
