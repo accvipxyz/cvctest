@@ -1,68 +1,40 @@
 import telebot
-import time
-import random
-from fastapi import FastAPI
-import uvicorn
-import threading
+import requests
+import csv
+from io import StringIO
 
-# استبدل بـ TOKEN الخاص بك
-TOKEN = "7348415101:AAHHTr-_gS65_MGzsEzIq0LEI4spGLGNVUc"
-# إنشاء مثيل من بوت Telegram
-bot = telebot.TeleBot(TOKEN)
+# إعداد البوت
+API_TOKEN = '6699616785:AAE1ti2QI01VSu2hNbWqE9u-mPrE8NG5jMA'
+bot = telebot.TeleBot(API_TOKEN)
 
-# قائمة الأذكار
-adhkar = [
-    "سبحان الله",
-    "الحمد لله",
-    "لا إله إلا الله",
-    "الله أكبر",
-    "لا حول ولا قوة إلا بالله",
-    "استغفر الله",
-    "صلى الله على النبي",
-    "اللهم صل وسلم على محمد وعلى آله وصحبه وسلم",
-]
+# رابط CSV للملف العام في Google Sheets
+CSV_URL = 'https://docs.google.com/spreadsheets/d/1uefkQQoLLOfhEsK0oRxME1UO93-W2vpbSQiQJDgX8aQ/export?format=csv'
 
-# قائمة معرفات الدردشة (تحتاج إلى تحديث هذه القائمة بمعرفات الدردشة الفعلية للمستخدمين)
-chat_ids = [
-    "5599020702",
-    # إضافة المزيد من معرفات الدردشة حسب الحاجة
-]
+def get_sheet_data():
+    response = requests.get(CSV_URL)
+    response.raise_for_status()
+    response.encoding = 'utf-8'  # التأكد من استخدام الترميز الصحيح
+    return list(csv.reader(StringIO(response.text)))
 
-# وظيفة إرسال ذكر عشوائي
-def send_random_dhikr():
-    # اختيار ذكر عشوائي من القائمة
-    dhikr = random.choice(adhkar)
+# التعامل مع رسالة المستخدم
+@bot.message_handler(func=lambda message: True)
+def handle_message(message):
+    query = message.text.strip()
+    if not query:
+        bot.reply_to(message, "الرجاء إدخال نص للبحث.")
+        return
 
-    # إرسال الذكر إلى جميع المستخدمين مع مراعاة حدود المعدل
-    for chat_id in chat_ids:
-        try:
-            bot.send_message(chat_id, dhikr)
-        except telebot.apihelper.ApiTelegramException as e:
-            if e.result_json['error_code'] == 429:
-                retry_after = int(e.result_json['parameters']['retry_after'])
-                time.sleep(retry_after)
-                bot.send_message(chat_id, dhikr)
+    data = get_sheet_data()
+    for row in data:
+        if row[0].strip() == query:
+            response_text = row[1].strip()
+            if response_text:
+                bot.reply_to(message, response_text)
             else:
-                print(f"Error: {e}")
+                bot.reply_to(message, "لم يتم العثور على نتائج مطابقة.")
+            return
 
-# تشغيل البوت بشكل مستمر
-def start_bot():
-    while True:
-        send_random_dhikr()
-        time.sleep(60)  # انتظار 5 دقائق قبل إرسال ذكر جديد
+    bot.reply_to(message, "لم يتم العثور على نتائج مطابقة.")
 
-# إنشاء تطبيق FastAPI
-app = FastAPI()
-
-@app.on_event("startup")
-async def startup_event():
-    # تشغيل البوت في عملية خلفية
-    bot_thread = threading.Thread(target=start_bot)
-    bot_thread.start()
-
-@app.get("/")
-def read_root():
-    return {"message": "Bot is running"}
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# تشغيل البوت
+bot.polling()
