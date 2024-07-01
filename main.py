@@ -6,8 +6,7 @@ import uvicorn
 import threading
 
 # استبدل بـ TOKEN الخاص بك
-TOKEN = "7348415101:AAHdpiDT6jH03VOFPxMF9cjwN0LL-V82buw"
-
+TOKEN = "7348415101:AAHHTr-_gS65_MGzsEzIq0LEI4spGLGNVUc"
 # إنشاء مثيل من بوت Telegram
 bot = telebot.TeleBot(TOKEN)
 
