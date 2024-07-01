@@ -5,7 +5,7 @@ from io import StringIO
 import time
 
 # إعداد البوت
-API_TOKEN = '6699616785:AAE1ti2QI01VSu2hNbWqE9u-mPrE8NG5jMA'
+API_TOKEN = '7194379257:AAF7rcIKRjZxIjZPc7KorRJ6j4keVJYM1oI'
 bot = telebot.TeleBot(API_TOKEN)
 
 # رابط CSV للملف العام في Google Sheets
