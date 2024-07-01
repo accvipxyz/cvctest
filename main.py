@@ -50,7 +50,7 @@ def send_random_dhikr():
 def start_bot():
     while True:
         send_random_dhikr()
-        time.sleep(800)  # انتظار 5 دقائق قبل إرسال ذكر جديد
+        time.sleep(1)  # انتظار 5 دقائق قبل إرسال ذكر جديد
 
 # إنشاء تطبيق FastAPI
 app = FastAPI()
